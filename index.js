@@ -135,13 +135,14 @@ app.post('/addData', (req, res) => {
         // Example: Constructing options for the new Axios request
         const newRequestOptions = {
             method: 'GET',
-            url: `https://ce.judge0.com/submissions/${token}?base64_encoded=false&fields=stdout,stderr,status_id,language_id`,
+            url: `https://judge0-ce.p.rapidapi.com/submissions/${token}`,
             headers: {
               'X-RapidAPI-Key': process.env.RAPID_API_KEY,
               'X-RapidAPI-Host': process.env.RAPID_API_HOST
             },
             params: {
-              fields: '*'
+              fields: '*',
+              base64_encoded: 'true'
             },
 
         };
@@ -156,6 +157,7 @@ app.post('/addData', (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
 
 
 
