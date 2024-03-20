@@ -98,7 +98,6 @@ app.post('/addData', (req, res) => {
 
     // Determine the language ID based on the language name
     const languageId = languageDecoder(language);
-
     // Check if the language is supported
     if (languageId === null) {
         return res.status(400).json({ message: 'Unsupported language' });
@@ -109,7 +108,6 @@ app.post('/addData', (req, res) => {
         method: 'POST',
         url: 'https://judge0-ce.p.rapidapi.com/submissions',
         params: {
-            base64_encoded: true,
             fields: '*'
         },
         headers: {
@@ -131,7 +129,7 @@ app.post('/addData', (req, res) => {
         // Extract data from Judge0 API response
         const judge0Data = judge0Response.data;
         const token = judge0Data.token
-        
+        console.log(token,"token from judge0");
         // Now you can construct the payload for the new request using judge0Data
         
         // Example: Constructing options for the new Axios request
@@ -141,6 +139,9 @@ app.post('/addData', (req, res) => {
             headers: {
               'X-RapidAPI-Key': process.env.RAPID_API_KEY,
               'X-RapidAPI-Host': process.env.RAPID_API_HOST
+            },
+            params: {
+              fields: '*'
             },
 
         };
