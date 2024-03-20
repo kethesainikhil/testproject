@@ -108,7 +108,9 @@ app.post('/addData', (req, res) => {
         method: 'POST',
         url: 'https://judge0-ce.p.rapidapi.com/submissions',
         params: {
-            fields: '*'
+            fields: '*',
+            base64_encoded: 'true'
+
         },
         headers: {
             'content-type': 'application/json',
@@ -157,6 +159,7 @@ app.post('/addData', (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
 
 
 
