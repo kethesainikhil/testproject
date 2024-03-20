@@ -1,11 +1,13 @@
 const express = require("express")
 const cors = require("cors");
+const axios = require('axios');
 const app = express()
 app.use(cors(
   {
       origin: "*",
   }
 ));
+
 const mysql = require("mysql")
 require("dotenv").config()
 const bodyParser = require('body-parser');
@@ -62,6 +64,77 @@ app.post('/addData', (req, res) => {
       res.status(200).json(result);
     });
   })
+  app.get('/getDataById',(req,res)=>{
+    const {id} = req.body;
+    const sql = 'select * from usertable where id = ?';
+    db.query(sql, [id], (err, result) => {
+      if (err) {
+        console.error('Error fetching in data:', err);
+        return res.status(500).json({ message: 'Internal server error' });
+      }
+      console.log('Data fecthed successfully');
+      res.status(200).json(result);
+    });
+  })
+  app.post('/uploadSourceCode', async (req, res) => {
+    const { sourcecode, language, stdin } = req.body;
+    
+    // Define a function to map language names to language IDs
+    const languageDecoder = (language) => {
+        switch (language) {
+            case "java":
+                return 62;
+            case "c++":
+                return 54;
+            case "python":
+                return 71;
+            case "javascript":
+                return 63;
+            default:
+                return null; // Return null for unsupported languages
+        }
+    };
+
+    // Determine the language ID based on the language name
+    const languageId = languageDecoder(language);
+
+    // Check if the language is supported
+    if (languageId === null) {
+        return res.status(400).json({ message: 'Unsupported language' });
+    }
+
+    // Options for the Axios request
+    const options = {
+        method: 'POST',
+        url: 'https://judge0-ce.p.rapidapi.com/submissions',
+        params: {
+            base64_encoded: true,
+            fields: '*'
+        },
+        headers: {
+            'content-type': 'application/json',
+            'X-RapidAPI-Key': 'e5a675319emsh7c327362f92fbc6p13cda4jsn9c7351747f7e',
+            'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com'
+        },
+        data: {
+            language_id: languageId,
+            source_code: sourcecode,
+            stdin: stdin
+        }
+    };
+
+    try {
+        // Make the Axios request
+        const response = await axios.request(options);
+        // Send the response from the Judge0 API back to the client
+        res.status(200).json(response.data);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
 
 app.listen(port, 
 ()=> console.log(`Server Started on port ${port}...`))
