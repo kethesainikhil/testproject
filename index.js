@@ -76,6 +76,7 @@ app.post('/addData', (req, res) => {
       res.status(200).json(result);
     });
   })
+  //execution phase
   app.post('/uploadSourceCode', async (req, res) => {
     const { sourcecode, language, stdin } = req.body;
     
@@ -103,8 +104,8 @@ app.post('/addData', (req, res) => {
         return res.status(400).json({ message: 'Unsupported language' });
     }
 
-    // Options for the Axios request
-    const options = {
+    // Options for the Axios request to Judge0 API
+    const judge0Options = {
         method: 'POST',
         url: 'https://judge0-ce.p.rapidapi.com/submissions',
         params: {
@@ -124,15 +125,37 @@ app.post('/addData', (req, res) => {
     };
 
     try {
-        // Make the Axios request
-        const response = await axios.request(options);
-        // Send the response from the Judge0 API back to the client
-        res.status(200).json(response.data);
+        // Make the Axios request to Judge0 API
+        const judge0Response = await axios.request(judge0Options);
+        
+        // Extract data from Judge0 API response
+        const judge0Data = judge0Response.data;
+        const token = judge0Data.token
+        
+        // Now you can construct the payload for the new request using judge0Data
+        
+        // Example: Constructing options for the new Axios request
+        const newRequestOptions = {
+            method: 'GET',
+            url: `https://judge0-ce.p.rapidapi.com/submissions/${token}`,
+            headers: {
+              'X-RapidAPI-Key': process.env.RAPID_API_KEY,
+              'X-RapidAPI-Host': process.env.RAPID_API_HOST
+            },
+
+        };
+
+        // Make the new Axios request
+        const newResponse = await axios.request(newRequestOptions);
+
+        // Send the response from the new endpoint back to the client
+        res.status(200).json(newResponse.data);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
 
 
 
