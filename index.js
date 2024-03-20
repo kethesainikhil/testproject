@@ -113,8 +113,8 @@ app.post('/addData', (req, res) => {
         },
         headers: {
             'content-type': 'application/json',
-            'X-RapidAPI-Key': 'e5a675319emsh7c327362f92fbc6p13cda4jsn9c7351747f7e',
-            'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com'
+            'X-RapidAPI-Key': process.env.RAPID_API_KEY,
+            'X-RapidAPI-Host': process.env.RAPID_API_HOST
         },
         data: {
             language_id: languageId,
