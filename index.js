@@ -49,7 +49,7 @@ app.post('/addData', (req, res) => {
         console.error('Error inserting data:', err);
         return res.status(500).json({ message: 'Internal server error' });
       }
-      console.log('Data inserted successfully');
+      console.log('Data inserted successfully into db');
       res.status(200).json({ message: 'Data inserted successfully' });
     });
   });
