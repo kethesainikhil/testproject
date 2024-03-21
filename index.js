@@ -109,7 +109,6 @@ app.post('/addData', (req, res) => {
         url: 'https://judge0-ce.p.rapidapi.com/submissions',
         params: {
             fields: '*',
-            base64_encoded: 'true'
 
         },
         headers: {
@@ -144,7 +143,6 @@ app.post('/addData', (req, res) => {
             },
             params: {
               fields: '*',
-              base64_encoded: 'true'
             },
 
         };
