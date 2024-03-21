@@ -124,39 +124,47 @@ app.post('/addData', (req, res) => {
     };
 
     try {
-        // Make the Axios request to Judge0 API
+        // Make the Axios request to Judge0 API for initial submission
         const judge0Response = await axios.request(judge0Options);
         
         // Extract data from Judge0 API response
         const judge0Data = judge0Response.data;
-        const token = judge0Data.token
-        console.log(token,"token from judge0");
-        // Now you can construct the payload for the new request using judge0Data
-        
-        // Example: Constructing options for the new Axios request
-        const newRequestOptions = {
-            method: 'GET',
-            url: `https://judge0-ce.p.rapidapi.com/submissions/${token}`,
-            headers: {
-              'X-RapidAPI-Key': process.env.RAPID_API_KEY,
-              'X-RapidAPI-Host': process.env.RAPID_API_HOST
-            },
-            params: {
-              fields: '*',
-            },
+        const token = judge0Data.token;
+        console.log(token, "token from judge0");
 
-        };
+        let submissionStatus = "In Queue";
+        let gotData = "";
+        // Polling loop to check submission status
+        while (submissionStatus === "In Queue") {
+            // Make a GET request to check submission status
+            const statusResponse = await axios.get(`https://judge0-ce.p.rapidapi.com/submissions/${token}`, {
+                headers: {
+                    'X-RapidAPI-Key': process.env.RAPID_API_KEY,
+                    'X-RapidAPI-Host': process.env.RAPID_API_HOST
+                },
+                params: {
+                    fields: '*'
+                }
+            });
+            console.log(statusResponse.data.status.description, "statusResponse");
+            // Extract status from response
+            submissionStatus = statusResponse.data.status.description;
+            gotData = statusResponse.data
 
-        // Make the new Axios request
-        const newResponse = await axios.request(newRequestOptions);
+            // If submission is still in Queue, wait for some time before checking again
+            if (submissionStatus === "In Queue") {
+                await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for 2 seconds
+            }
+        }
 
-        // Send the response from the new endpoint back to the client
-        res.status(200).json(newResponse.data);
+        // Once submission status changes, send the final response back to the client
+        res.status(200).json({ message: 'Submission completed', status: submissionStatus,data:gotData });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
 
 
 
