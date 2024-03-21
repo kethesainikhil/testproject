@@ -64,8 +64,8 @@ app.post('/addData', (req, res) => {
       res.status(200).json(result);
     });
   })
-  app.get('/getDataById',(req,res)=>{
-    const {id} = req.body;
+  app.get('/getDataById/:id',(req,res)=>{
+    const id = req.params.id
     const sql = 'select * from usertable where id = ?';
     db.query(sql, [id], (err, result) => {
       if (err) {
